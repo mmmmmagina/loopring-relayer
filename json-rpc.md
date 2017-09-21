@@ -70,7 +70,7 @@ This method extendes method `approve` in `ERC20` contract to support changing am
 
 ##### Parameters
 
-1. `String` `Required`-The first raw transaction.
+1. `String` <font color=gray size=72>`Required`</font>-The first raw transaction.
 2. `String` `Optional` - The second raw transaction. if you want changing allowance in this conditon: `a -> b where a > 0 and b > 0`, this param must be applied.
 
 ```js
