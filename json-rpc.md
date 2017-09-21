@@ -5,135 +5,107 @@
 
 [JSON-RPC](http://www.jsonrpc.org/specification) is a stateless, light-weight remote procedure call (RPC) protocol. Primarily this specification defines several data structures and the rules around their processing. It is transport agnostic in that the concepts can be used within the same process, over sockets, over HTTP, or in many various message passing environments. It uses JSON ([RFC 4627](http://www.ietf.org/rfc/rfc4627.txt)) as data format.
 
-## JSON-RPC Endpoint
+## JSON-RPC methods 
 
-Default JSON-RPC endpoints:
-```
-C++: http://localhost:8545
-Go: http://localhost:8545
-Py: http://localhost:4000
-```
+* [eth_gasPrice](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice)
+* [eth_blockNumber](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_blocknumber)
+* [eth_getBalance](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getbalance)
+* [eth_getTransactionCount](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount)
+* [eth_sendRawTransaction](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sendrawtransaction)
+* [eth_call](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_call)
+* [eth_estimateGas](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas)
+* [eth_getTransactionByHash](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getTransactionByHash)
+* [eth_setTokenAllowance](#eth_setTokenAllowance)
 
-## Output HEX values
+* [loopring_submitOrder](#loopring_submitOrder)
 
-At present there are two key datatypes that are passed over JSON: unformatted byte arrays and quantities. Both are passed with a hex encoding, however with different requirements to formatting:
+params   order json string
+result null
 
-When encoding **QUANTITIES** (integers, numbers): encode as hex, prefix with "0x", the most compact representation (slight exception: zero should be represented as "0x0"). Examples:
-- 0x41 (65 in decimal)
-- 0x400 (1024 in decimal)
-- WRONG: 0x (should always have at least one digit - zero is "0x0")
-- WRONG: 0x0400 (no leading zeroes allowed)
-- WRONG: ff (must be prefixed 0x)
+* [loopring_cancelOrder](#loopring_cancelOrder) 
+params orderHash , v, r, s
+return null result
 
-When encoding **UNFORMATTED DATA** (byte arrays, account addresses, hashes, bytecode arrays): encode as hex, prefix with "0x", two hex digits per byte. Examples:
-- 0x41 (size 1, "A")
-- 0x004200 (size 3, "\0B\0")
-- 0x (size 0, "")
-- WRONG: 0xf0f0f (must be even number of digits)
-- WRONG: 004200 (must be prefixed 0x)
 
-## JSON-RPC methods
 
-* [web3_clientVersion](#web3_clientversion)
-* [web3_sha3](#web3_sha3)
-* [net_version](#net_version)
-* [net_peerCount](#net_peercount)
-* [net_listening](#net_listening)
-* [eth_protocolVersion](#eth_protocolversion)
-* [eth_syncing](#eth_syncing)
-* [eth_coinbase](#eth_coinbase)
-* [eth_mining](#eth_mining)
-* [eth_hashrate](#eth_hashrate)
-* [eth_gasPrice](#eth_gasprice)
-* [eth_accounts](#eth_accounts)
-* [eth_blockNumber](#eth_blocknumber)
-* [eth_getBalance](#eth_getbalance)
-* [eth_getStorageAt](#eth_getstorageat)
-* [eth_getTransactionCount](#eth_gettransactioncount)
-* [eth_getBlockTransactionCountByHash](#eth_getblocktransactioncountbyhash)
-* [eth_getBlockTransactionCountByNumber](#eth_getblocktransactioncountbynumber)
-* [eth_getUncleCountByBlockHash](#eth_getunclecountbyblockhash)
-* [eth_getUncleCountByBlockNumber](#eth_getunclecountbyblocknumber)
-* [eth_getCode](#eth_getcode)
-* [eth_sign](#eth_sign)
-* [eth_sendTransaction](#eth_sendtransaction)
-* [eth_sendRawTransaction](#eth_sendrawtransaction)
-* [eth_call](#eth_call)
-* [eth_estimateGas](#eth_estimategas)
-* [eth_getBlockByHash](#eth_getblockbyhash)
-* [eth_getBlockByNumber](#eth_getblockbynumber)
-* [eth_getTransactionByHash](#eth_gettransactionbyhash)
-* [eth_getTransactionByBlockHashAndIndex](#eth_gettransactionbyblockhashandindex)
-* [eth_getTransactionByBlockNumberAndIndex](#eth_gettransactionbyblocknumberandindex)
-* [eth_getTransactionReceipt](#eth_gettransactionreceipt)
-* [eth_getUncleByBlockHashAndIndex](#eth_getunclebyblockhashandindex)
-* [eth_getUncleByBlockNumberAndIndex](#eth_getunclebyblocknumberandindex)
-* [eth_getCompilers](#eth_getcompilers)
-* [eth_compileLLL](#eth_compilelll)
-* [eth_compileSolidity](#eth_compilesolidity)
-* [eth_compileSerpent](#eth_compileserpent)
-* [eth_newFilter](#eth_newfilter)
-* [eth_newBlockFilter](#eth_newblockfilter)
-* [eth_newPendingTransactionFilter](#eth_newpendingtransactionfilter)
-* [eth_uninstallFilter](#eth_uninstallfilter)
-* [eth_getFilterChanges](#eth_getfilterchanges)
-* [eth_getFilterLogs](#eth_getfilterlogs)
-* [eth_getLogs](#eth_getlogs)
-* [eth_getWork](#eth_getwork)
-* [eth_submitWork](#eth_submitwork)
-* [eth_submitHashrate](#eth_submithashrate)
-* [db_putString](#db_putstring)
-* [db_getString](#db_getstring)
-* [db_putHex](#db_puthex)
-* [db_getHex](#db_gethex) 
-* [shh_post](#shh_post)
-* [shh_version](#shh_version)
-* [shh_newIdentity](#shh_newidentity)
-* [shh_hasIdentity](#shh_hasidentity)
-* [shh_newGroup](#shh_newgroup)
-* [shh_addToGroup](#shh_addtogroup)
-* [shh_newFilter](#shh_newfilter)
-* [shh_uninstallFilter](#shh_uninstallfilter)
-* [shh_getFilterChanges](#shh_getfilterchanges)
-* [shh_getMessages](#shh_getmessages)
+* [loopring_getOrderByHash](#loopring_getOrderByHash)
+params orderHash, params:["order hash"]
+return order object
+
+
+* [loopring_getOrdersByAddress](#loopring_getOrdersByAddress)
+params orderHash, params:["address"]
+return order object list
+
+* [loopring_getDepth](#loopring_getDepth)
+params:{"from": "A", "to" : "B", "accuracy": "0.01", length: 50}
+result:{"depth" {"buy" :[[12.0, 0.01],[]]..., "sell" : [] , "accuracies":[0.1, 0.01, 4.0]}
+
+* [loopring_getDepthAccuracies](#loopring_getDepthAccuracy)
+params:{"from": "A", "to" : "B"}
+result: [0.01, 0.1, 4.0]
+
+
+* [loopring_ticker](#loopring_ticker)
+params: {"from": "A", "to" : "B"}
+result: {"new price": 123, "latest deal amount": 123.0,....}
+
+* [loopring_getDealHistory](#loopring_getDealHistory)
+params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize: 20}
+result: {pageIndex:"", pageSize: "", [orders]}
+
+* [loopring_getCandleData](#loopring_getCandleData)
+params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize: 20}
+
+
 
 ## JSON RPC API Reference
 
 ***
 
-#### web3_clientVersion
+#### eth_setTokenAllowance
 
-Returns the current client version.
+Change token allowance quantity. 
+This method extendes method `approve` in `ERC20` contract to support changing amount to positive integer while previous amount is a positive integer.
 
 ##### Parameters
-none
+
+1. `String` `Required`-The first raw transaction.
+2. `String` `Optional` - The second raw transaction. if you want changing allowance in this conditon: `a -> b where a > 0 and b > 0`, this param must be applied.
+
+```js
+params: [
+  "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675", // required
+  "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675" // optional
+]
+```
 
 ##### Returns
 
-`String` - The current client version
+`String` - content like `SUBMIT_SUCCESS` for async request.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":67}'
-
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_setTokenAllowance","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675", "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":67}'
+ 
 // Result
 {
   "id":67,
   "jsonrpc":"2.0",
-  "result": "Mist/v0.9.3/darwin/go1.4.1"
+  "result": "SUBMIT_SUCCESS"
 }
 ```
 
 ***
 
-#### web3_sha3
+#### loopring_submitOrder
 
-Returns Keccak-256 (*not* the standardized SHA3-256) of the given data.
+Submit loopring order.
 
 ##### Parameters
 
-1. `String` - the data to convert into a SHA3 hash
+1. `String` - order object string
 
 ```js
 params: [
@@ -143,7 +115,7 @@ params: [
 
 ##### Returns
 
-`DATA` - The SHA3 result of the given string.
+`String` - The order hash.
 
 ##### Example
 ```js
