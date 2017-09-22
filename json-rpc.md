@@ -18,43 +18,13 @@
 * [eth_setTokenAllowance](#eth_setTokenAllowance)
 
 * [loopring_submitOrder](#loopring_submitOrder)
-
-params   order json string
-result null
-
-* [loopring_cancelOrder](#loopring_cancelOrder) 
-params orderHash , v, r, s
-return null result
-
-
-
+* [loopring_cancelOrder](#loopring_cancelOrder)
 * [loopring_getOrderByHash](#loopring_getOrderByHash)
-params orderHash, params:["order hash"]
-return order object
-
-
 * [loopring_getOrdersByAddress](#loopring_getOrdersByAddress)
-params orderHash, params:["address"]
-return order object list
-
 * [loopring_getDepth](#loopring_getDepth)
-params:{"from": "A", "to" : "B", "accuracy": "0.01", length: 50}
-result:{"depth" {"buy" :[[12.0, 0.01],[]]..., "sell" : [] , "accuracies":[0.1, 0.01, 4.0]}
-
-* [loopring_getDepthAccuracies](#loopring_getDepthAccuracy)
-params:{"from": "A", "to" : "B"}
-result: [0.01, 0.1, 4.0]
-
-
 * [loopring_ticker](#loopring_ticker)
-params: {"from": "A", "to" : "B"}
-result: {"new price": 123, "latest deal amount": 123.0,....}
-
 * [loopring_getDealHistory](#loopring_getDealHistory)
-params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize: 20}
-result: {pageIndex:"", pageSize: "", [orders]}
-
-* [loopring_getCandleData](#loopring_getCandleData)
+* [loopring_getCandleTicks](#loopring_getCandleTicks)
 params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize: 20}
 
 
@@ -66,16 +36,16 @@ params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize
 #### eth_setTokenAllowance
 
 Change token allowance quantity. 
-This method extendes method `approve` in `ERC20` contract to support changing amount to positive integer while previous amount is a positive integer.
+This method extendes method `approve` in `ERC20` contract to support changing amount to positive integer while previous amount is also a positive integer.
 
 ##### Parameters
 
-1. `String` <font color=gray size=72>`Required`</font>-The first raw transaction.
+1. `String` `Required` - The first raw transaction.
 2. `String` `Optional` - The second raw transaction. if you want changing allowance in this conditon: `a -> b where a > 0 and b > 0`, this param must be applied.
 
 ```js
 params: [
-  "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675", // required
+  "0xa3b225d374f2b47254eb970870f07244567435058bb8eb3ab970870f4d072445642e7522acdb429064", // required
   "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675" // optional
 ]
 ```
@@ -87,7 +57,7 @@ params: [
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"eth_setTokenAllowance","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675", "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":67}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_setTokenAllowance","params":["0xa3b225d374f2b47254eb970870f07244567435058bb8eb3ab970870f4d072445642e7522acdb429064", "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":67}'
  
 // Result
 {
@@ -105,12 +75,37 @@ Submit loopring order.
 
 ##### Parameters
 
-1. `String` - order object string
+`Object` - The order object(refer to [LoopringProtocol](https://github.com/Loopring/protocol/blob/master/contracts/LoopringProtocol.sol))
+  - `address` - Order submit address
+  - `tokenS` - Token to sell.
+  - `tokenB` - Token to buy.
+  - `amountS` - Maximum amount of tokenS to sell.
+  - `amountB` - Minimum amount of tokenB to buy if all amountS sold.
+  - `expiration` - Indicating when this order will expire.
+  - `rand` - A random number to make this order's hash unique.
+  - `lrcFee` - Max amount of LRC to pay for miner. The real amount to pay is proportional to fill amount.
+  - `buyNoMoreThanAmountB` - If true, this order does not accept buying more than `amountB`.
+  - `savingSharePercentage` - The percentage of savings paid to miner.
+  - `v` - ECDSA signature parameter v.
+  - `r` - ECDSA signature parameter r.
+  - `s` - ECDSA signature parameter s.
 
 ```js
-params: [
-  '0x68656c6c6f20776f726c64'
-]
+params: {
+  "address" : "0x847983c3a34afa192cfee860698584c030f4c9db1",
+  "tokenS" : "Eth",
+  "tokenB" : "Lrc",
+  "amountS" : 100.3,
+  "amountB" : 3838434,
+  "expiration" 1406014710,
+  "rand" : 3848348,
+  "lrcFee" : 20,
+  "buyNoMoreThanAmountB" : true,
+  "savingSharePercentage" : 50, // 0~100
+  "v" : 112,
+  "r" : "239dskjfsn23ck34323434md93jchek3",
+  "s" : "dsfsdf234ccvcbdsfsdf23438cjdkldy",
+}
 ```
 
 ##### Returns
@@ -120,7 +115,7 @@ params: [
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c6f20776f726c64"],"id":64}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"loopring_submitOrder","params":{see above},"id":64}'
 
 // Result
 {
@@ -132,359 +127,447 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c
 
 ***
 
-#### net_version
+#### loopring_cancelOrder
 
-Returns the current network protocol version.
+Cancel loopring order.
 
 ##### Parameters
-none
+
+`Object` - include order hash and signature params
+  - `orderHash` - The order hash.
+  - `v` - ECDSA signature parameter v.
+  - `r` - ECDSA signature parameter r.
+  - `s` - ECDSA signature parameter s.
+
+```js
+params: {
+  "orderHash" : "0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad",
+  "v" : 112,
+  "r" : "239dskjfsn23ck34323434md93jchek3",
+  "s" : "dsfsdf234ccvcbdsfsdf23438cjdkldy",
+}
+```
 
 ##### Returns
 
-`String` - The current network protocol version
+`String` - content like `SUBMIT_SUCCESS` for async request.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"net_version","params":[],"id":67}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"loopring_cancelOrder","params":{see above},"id":64}'
 
 // Result
 {
-  "id":67,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": "59"
+  "result": "SUBMIT_SUCCESS"
 }
 ```
 
 ***
 
-#### net_listening
+#### loopring_getOrderByHash
 
-Returns `true` if client is actively listening for network connections.
+Get loopring order detail info by order hash.
 
 ##### Parameters
-none
 
-##### Returns
+`String` - The order hash
 
-`Boolean` - `true` when listening, otherwise `false`.
-
-##### Example
 ```js
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"net_listening","params":[],"id":67}'
-
-// Result
-{
-  "id":67,
-  "jsonrpc":"2.0",
-  "result":true
-}
+params: ["0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad"]
 ```
 
-***
-
-#### net_peerCount
-
-Returns number of peers currenly connected to the client.
-
-##### Parameters
-none
-
 ##### Returns
 
-`QUANTITY` - integer of the number of connected peers.
+1. `orginalOrder` `Object` - The original order info when submitting.(refer to [LoopringProtocol](https://github.com/Loopring/protocol/blob/master/contracts/LoopringProtocol.sol))
+  - `address` - Order submit address
+  - `tokenS` - Token to sell.
+  - `tokenB` - Token to buy.
+  - `amountS` - Maximum amount of tokenS to sell.
+  - `amountB` - Minimum amount of tokenB to buy if all amountS sold.
+  - `expiration` - Indicating when this order will expire.
+  - `rand` - A random number to make this order's hash unique.
+  - `lrcFee` - Max amount of LRC to pay for miner. The real amount to pay is proportional to fill amount.
+  - `buyNoMoreThanAmountB` - If true, this order does not accept buying more than `amountB`.
+  - `savingSharePercentage` - The percentage of savings paid to miner.
+  - `v` - ECDSA signature parameter v.
+  - `r` - ECDSA signature parameter r.
+  - `s` - ECDSA signature parameter s.
+  - `timestamp` - The submit TimeStamp.
+
+2. `status` `STRING` - Order status. refer to `Order Status Set` (include Pending, PartiallyExecuted, FullyExecuted, Cancelled)
+3. `totalDealedAmountS` `NUMBER` - The total amount of TokenS that have been selled. 
+4. `totalDealedAmountB` `NUMBER` - The total amount of TokenB that have been buyed.
+5. `matchList` `ARRAY` -  The match records related to this order.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"loopring_getOrderByHash","params":{see above},"id":64}'
 
 // Result
 {
-  "id":74,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": "0x2" // 2
+  "result": {
+    "orginalOrder" : {
+      "address" : "0x847983c3a34afa192cfee860698584c030f4c9db1",
+      "tokenS" : "Eth",
+      "tokenB" : "Lrc",
+      "amountS" : 100.3,
+      "amountB" : 3838434,
+      "expiration" : "2017-11-11 19:00:01",
+      "rand" : 3848348,
+      "lrcFee" : 20,
+      "buyNoMoreThanAmountB" : true,
+      "savingSharePercentage" : 50, // 0~100
+      "v" : 112,
+      "r" : "239dskjfsn23ck34323434md93jchek3",
+      "s" : "dsfsdf234ccvcbdsfsdf23438cjdkldy"
+    },
+    "status" : "PartiallyExecuted",
+    "totalDealedAmountS" : 30,
+    "totalDealedAmountB" : 29333.21,
+    "matchList" : {
+      "total" : 301,
+      "pageIndex" : 2,
+      "pageSize" : 20
+      "data" : [
+        {
+          "timestamp" : "1506014710000",
+          "amountS" : 30.31,
+          "amountB" : 3934.111,
+          "txHash" : "0x1eb8d538bb9727028912f57c54776d90c1927e3b49f34a2e53e9271949ec044c"
+        },
+        {
+          "timestamp" : "1506014710323",
+          "amountS" : 30.31,
+          "amountB" : 3934.111,
+          "txHash" : "0x1eb8d538bb9727028912f57c54776d90c1927e3b49f34a2e53e9271949ec044c"
+        }
+      ]
+    }
+  }
 }
 ```
 
 ***
 
-#### shh_newIdentity
 
-Creates new whisper identity in the client.
+#### loopring_getOrdersByAddress
+
+Get loopring order list by address.
 
 ##### Parameters
-none
+
+`String` - The address
+
+```js
+params: ["0x847983c3a34afa192cfee860698584c030f4c9db1"]
+```
 
 ##### Returns
 
-`DATA`, 60 Bytes - the address of the new identiy.
+`PageResult of Order` - Order list with page info
+
+1. `data` `LoopringOrder` - The original order info when submitting.(refer to [LoopringProtocol](https://github.com/Loopring/protocol/blob/master/contracts/LoopringProtocol.sol))
+  - `address` - Order submit address
+  - `tokenS` - Token to sell.
+  - `tokenB` - Token to buy.
+  - `amountS` - Maximum amount of tokenS to sell.
+  - `amountB` - Minimum amount of tokenB to buy if all amountS sold.
+  - `expiration` - Indicating when this order will expire.
+  - `rand` - A random number to make this order's hash unique.
+  - `lrcFee` - Max amount of LRC to pay for miner. The real amount to pay is proportional to fill amount.
+  - `buyNoMoreThanAmountB` - If true, this order does not accept buying more than `amountB`.
+  - `savingSharePercentage` - The percentage of savings paid to miner.
+  - `v` - ECDSA signature parameter v.
+  - `r` - ECDSA signature parameter r.
+  - `s` - ECDSA signature parameter s.
+  - `timestamp` - The submit TimeStamp.
+
+2. `total` `NUMBER` - Total amount of orders.
+3. `pageIndex` `NUMBER` - Index of page.
+4. `pageSize` `NUMBER` - Amount per page.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_newIdentity","params":[],"id":73}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"loopring_getOrderByHash","params":{see above},"id":64}'
 
 // Result
 {
-  "id":1,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": "0xc931d93e97ab07fe42d923478ba2465f283f440fd6cabea4dd7a2c807108f651b7135d1d6ca9007d5b68aa497e4619ac10aa3b27726e1863c1fd9b570d99bbaf"
+  "result": {
+    "data" : [
+      "orginalOrder" : {
+        "address" : "0x847983c3a34afa192cfee860698584c030f4c9db1",
+        "tokenS" : "Eth",
+        "tokenB" : "Lrc",
+        "amountS" : 100.3,
+        "amountB" : 3838434,
+        "expiration" : "2017-11-11 19:00:01",
+        "rand" : 3848348,
+        "lrcFee" : 20,
+        "buyNoMoreThanAmountB" : true,
+        "savingSharePercentage" : 50, // 0~100
+        "v" : 112,
+        "r" : "239dskjfsn23ck34323434md93jchek3",
+        "s" : "dsfsdf234ccvcbdsfsdf23438cjdkldy"
+      },
+      "status" : "PartiallyExecuted",
+      "totalDealedAmountS" : 30,
+      "totalDealedAmountB" : 29333.21,
+      "matchList" : {
+        "total" : 301,
+        "pageIndex" : 2,
+        "pageSize" : 20
+        "data" : [
+          {
+            "timestamp" : "1506014710000",
+            "amountS" : 30.31,
+            "amountB" : 3934.111,
+            "txHash" : "0x1eb8d538bb9727028912f57c54776d90c1927e3b49f34a2e53e9271949ec044c"
+          },
+          {
+            "timestamp" : "1506014710323",
+            "amountS" : 30.31,
+            "amountB" : 3934.111,
+            "txHash" : "0x1eb8d538bb9727028912f57c54776d90c1927e3b49f34a2e53e9271949ec044c"
+          }
+        ]
+      },
+      {}....
+    ]
+    "total" : 12,
+    "pageIndex" : 1,
+    "pageSize" : 10
+  }
 }
 ```
 
 ***
 
-#### shh_hasIdentity
+#### loopring_getDepth
 
-Checks if the client hold the private keys for a given identity.
-
+Get depth and accuracy by token pair
 
 ##### Parameters
 
-1. `DATA`, 60 Bytes - The identity address to check.
+1. `from` `String` - The token to sell
+2. `to` `String` - The token to buy
+3. `length` `NUMBER` - The length of the depth data. defalut is 50.
+
 
 ```js
-params: [
-  "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"
-]
+params: {
+  "from" : "Eth",
+  "to" : "Lrc",
+  "length" : 10 // defalut is 50
+}
 ```
 
 ##### Returns
 
-`Boolean` - returns `true` if the client holds the privatekey for that identity, otherwise `false`.
-
+1. `depth` - The depth data.
+2. `accuracies` `ARRAY OF NUMBER` - The accuracies.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_hasIdentity","params":["0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"],"id":73}'
+curl -X POST --data '{"jsonrpc":"2.0","method":"loopring_getDepth","params":{see above},"id":64}'
 
 // Result
 {
-  "id":1,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": true
+  "result": {
+    "depth" : {
+      "buy" : [
+        [200.1, 10.3], [199.8, 2], [198.3, 23]
+      ],
+      "sell" : [
+        [205.1, 13], [211.8, 0.5], [321.3, 33]
+      ]
+    },
+    "accuracies" : [0.01, 0.05, 0.1, 0.5]
+  }
 }
 ```
 
 ***
 
-#### shh_newGroup
 
-(?)
+#### loopring_ticker
+
+Get 24hr merged ticker info from loopring relayer.
 
 ##### Parameters
-none
+
+1. `from` `String` - The token to sell
+2. `to` `String` - The token to buy
+
+```js
+params: {
+  "from" : "Eth",
+  "to" : "Lrc"
+}
+```
 
 ##### Returns
 
-`DATA`, 60 Bytes - the address of the new group. (?)
+1. `high`
+2. `low`
+3. `last`
+4. `vol`
+5. `buy`
+6. `sell`
+7. `ts` - Timestamp.
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_newIdentity","params":[],"id":73}'
+curl -X GET --data '{"jsonrpc":"2.0","method":"loopring_ticker","params":{see above},"id":64}'
 
 // Result
 {
-  "id":1,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": "0xc65f283f440fd6cabea4dd7a2c807108f651b7135d1d6ca90931d93e97ab07fe42d923478ba2407d5b68aa497e4619ac10aa3b27726e1863c1fd9b570d99bbaf"
+  "result": {
+    "high" : 30384.2,
+    "low" : 19283.2,
+    "last" : 28002.2,
+    "vol" : 1038,
+    "buy" : 122321,
+    "sell" : 12388,
+    "ts" : 1506014710000
+  }
 }
 ```
 
 ***
 
-#### shh_addToGroup
+#### loopring_getDealHistory
 
-(?)
+Get 24hr merged ticker info from loopring relayer.
 
 ##### Parameters
 
-1. `DATA`, 60 Bytes - The identity address to add to a group (?).
+1. `from` `String` - The token to sell
+2. `to` `String` - The token to buy
+3. `address`
+4. `pageIndex`
+5. `pageSize`
 
 ```js
-params: [
-  "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"
-]
+params: {
+  "from" : "Eth",
+  "to" : "Lrc"
+  "address" : "0x8888f1f195afa192cfee860698584c030f4c9db1",
+  "pageIndex" : 1,
+  "pageSize" : 20 // max size is 50.
+}
 ```
 
 ##### Returns
 
-`Boolean` - returns `true` if the identity was successfully added to the group, otherwise `false` (?).
+`PAGERESULT of OBJECT`
+1. `ARRAY OF DATA` - The match histories.
+  - `txHash` - The transaction hash of the match.
+  - `dealAmountS` - Amount of sell.
+  - `dealAmountB` - Amount of buy.
+  - `ts` - The timestamp of matching time.
+  - `relatedOrderHash` - The order hash.
+2. `pageIndex`
+3. `pageSize`
+4. `total`
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_hasIdentity","params":["0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"],"id":73}'
+curl -X GET --data '{"jsonrpc":"2.0","method":"loopring_getDealHistory","params":{see above},"id":64}'
 
 // Result
 {
-  "id":1,
+  "id":64,
   "jsonrpc": "2.0",
-  "result": true
+  "result": {
+    "data" : [
+      {
+        "txHash" : "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+        "dealAmountS" : 20,
+        "dealAmountB" : 30.21,
+        "ts" : 1506014710000
+      }
+    ],
+    "pageIndex" : 1,
+    "pageSize" : 20,
+    "total" : 212
+  }
 }
 ```
 
 ***
 
-#### shh_newFilter
+#### loopring_getCandleTicks
 
-Creates filter to notify, when client receives whisper message matching the filter options.
-
+Get tick infos for kline.
 
 ##### Parameters
 
-1. `Object` - The filter options:
-  - `to`: `DATA`, 60 Bytes - (optional) Identity of the receiver. *When present it will try to decrypt any incoming message if the client holds the private key to this identity.*
-  - `topics`: `Array of DATA` - Array of `DATA` topics which the incoming message's topics should match.  You can use the following combinations:
-    - `[A, B] = A && B`
-    - `[A, [B, C]] = A && (B || C)`
-    - `[null, A, B] = ANYTHING && A && B` `null` works as a wildcard
+1. `from` `String` - The token to sell
+2. `to` `String` - The token to buy
+3. `interval` - The interval of kline. enum like: 1m, 5m, 6h, 1d....
+4. `size` - The data size.
 
 ```js
-params: [{
-   "topics": ['0x12341234bf4b564f'],
-   "to": "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"
-}]
+params: {
+  "from" : "Eth",
+  "to" : "Lrc"
+  "address" : "0x8888f1f195afa192cfee860698584c030f4c9db1",
+  "pageIndex" : 1,
+  "pageSize" : 20 // max size is 50.
+}
 ```
 
 ##### Returns
 
-`QUANTITY` - The newly created filter.
+`ARRAY OF DATA`
+  - `dealAmountS` - Total amount of sell.
+  - `dealAmountB` - Total amount of buy.
+  - `ts` - The timestamp of matching time.
+  - `open` - The opening price.
+  - `close` - The closing price.
+  - `high` - The highest price in interval.
+  - `low` - The lowest price in interval.
+
 
 ##### Example
 ```js
 // Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_newFilter","params":[{"topics": ['0x12341234bf4b564f'],"to": "0x2341234bf4b2341234bf4b564f..."}],"id":73}'
+curl -X GET --data '{"jsonrpc":"2.0","method":"loopring_getCandleTicks","params":{see above},"id":64}'
 
 // Result
 {
-  "id":1,
-  "jsonrpc":"2.0",
-  "result": "0x7" // 7
+  "id":64,
+  "jsonrpc": "2.0",
+  "result": {
+    "data" : [
+      {
+        "dealAmountS" : 20,
+        "dealAmountB" : 30.21,
+        "ts" : 1506014710000
+        "open" : 3232.1,
+        "close" : 2321,
+        "high" : 1231.2,
+        "low" : 1234.2
+      }
+    ]
+  }
 }
 ```
 
 ***
-
-#### shh_uninstallFilter
-
-Uninstalls a filter with given id. Should always be called when watch is no longer needed.
-Additonally Filters timeout when they aren't requested with [shh_getFilterChanges](#shh_getfilterchanges) for a period of time.
-
-
-##### Parameters
-
-1. `QUANTITY` - The filter id.
-
-```js
-params: [
-  "0x7" // 7
-]
-```
-
-##### Returns
-
-`Boolean` - `true` if the filter was successfully uninstalled, otherwise `false`.
-
-##### Example
-```js
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_uninstallFilter","params":["0x7"],"id":73}'
-
-// Result
-{
-  "id":1,
-  "jsonrpc":"2.0",
-  "result": true
-}
-```
-
-***
-
-#### shh_getFilterChanges
-
-Polling method for whisper filters. Returns new messages since the last call of this method.
-
-**Note** calling the [shh_getMessages](#shh_getmessages) method, will reset the buffer for this method, so that you won't receive duplicate messages.
-
-
-##### Parameters
-
-1. `QUANTITY` - The filter id.
-
-```js
-params: [
-  "0x7" // 7
-]
-```
-
-##### Returns
-
-`Array` - Array of messages received since last poll:
-
-  - `hash`: `DATA`, 32 Bytes (?) - The hash of the message.
-  - `from`: `DATA`, 60 Bytes - The sender of the message, if a sender was specified.
-  - `to`: `DATA`, 60 Bytes - The receiver of the message, if a receiver was specified.
-  - `expiry`: `QUANTITY` - Integer of the time in seconds when this message should expire (?).
-  - `ttl`: `QUANTITY` -  Integer of the time the message should float in the system in seconds (?).
-  - `sent`: `QUANTITY` -  Integer of the unix timestamp when the message was sent.
-  - `topics`: `Array of DATA` - Array of `DATA` topics the message contained.
-  - `payload`: `DATA` - The payload of the message.
-  - `workProved`: `QUANTITY` - Integer of the work this message required before it was send (?).
-
-##### Example
-```js
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_getFilterChanges","params":["0x7"],"id":73}'
-
-// Result
-{
-  "id":1,
-  "jsonrpc":"2.0",
-  "result": [{
-    "hash": "0x33eb2da77bf3527e28f8bf493650b1879b08c4f2a362beae4ba2f71bafcd91f9",
-    "from": "0x3ec052fc33..",
-    "to": "0x87gdf76g8d7fgdfg...",
-    "expiry": "0x54caa50a", // 1422566666
-    "sent": "0x54ca9ea2", // 1422565026
-    "ttl": "0x64" // 100
-    "topics": ["0x6578616d"],
-    "payload": "0x7b2274797065223a226d657373616765222c2263686...",
-    "workProved": "0x0"
-    }]
-}
-```
-
-***
-
-#### shh_getMessages
-
-Get all messages matching a filter, which are still existing in the node's buffer.
-
-**Note** calling this method, will also reset the buffer for the [shh_getFilterChanges](#shh_getfilterchanges) method, so that you won't receive duplicate messages.
-
-##### Parameters
-
-1. `QUANTITY` - The filter id.
-
-```js
-params: [
-  "0x7" // 7
-]
-```
-
-##### Returns
-
-See [shh_getFilterChanges](#shh_getfilterchanges)
-
-##### Example
-```js
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"shh_getMessages","params":["0x7"],"id":73}'
-```
-
-Result see [shh_getFilterChanges](#shh_getfilterchanges)
