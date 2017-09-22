@@ -1,9 +1,11 @@
 
-# JSON RPC API
+# RELAYER JSON-RPC API
 
 [JSON](http://json.org/) is a lightweight data-interchange format. It can represent numbers, strings, ordered sequences of values, and collections of name/value pairs.
 
 [JSON-RPC](http://www.jsonrpc.org/specification) is a stateless, light-weight remote procedure call (RPC) protocol. Primarily this specification defines several data structures and the rules around their processing. It is transport agnostic in that the concepts can be used within the same process, over sockets, over HTTP, or in many various message passing environments. It uses JSON ([RFC 4627](http://www.ietf.org/rfc/rfc4627.txt)) as data format.
+
+`LOOPRING RELAYER` is a relay helping to communicate with eth network and do curd operations for the loopring order.
 
 ## JSON-RPC methods 
 
