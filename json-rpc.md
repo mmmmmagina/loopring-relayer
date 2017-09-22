@@ -16,7 +16,6 @@
 * [eth_estimateGas](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas)
 * [eth_getTransactionByHash](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getTransactionByHash)
 * [eth_setTokenAllowance](#eth_setTokenAllowance)
-
 * [loopring_submitOrder](#loopring_submitOrder)
 * [loopring_cancelOrder](#loopring_cancelOrder)
 * [loopring_getOrderByHash](#loopring_getOrderByHash)
@@ -179,7 +178,7 @@ params: ["0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad"]
 
 ##### Returns
 
-1. `orginalOrder` `Object` - The original order info when submitting.(refer to [LoopringProtocol](https://github.com/Loopring/protocol/blob/master/contracts/LoopringProtocol.sol))
+1. `orginalOrder` `<span style="color:blue">Object</span>` - The original order info when submitting.(refer to [LoopringProtocol](https://github.com/Loopring/protocol/blob/master/contracts/LoopringProtocol.sol))
   - `address` - Order submit address
   - `tokenS` - Token to sell.
   - `tokenB` - Token to buy.
