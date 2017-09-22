@@ -25,8 +25,6 @@
 * [loopring_ticker](#loopring_ticker)
 * [loopring_getDealHistory](#loopring_getDealHistory)
 * [loopring_getCandleTicks](#loopring_getCandleTicks)
-params: {"from": "A", "to" : "B", "address": "0xsdkfdfj", pageIndex: 0, pageSize: 20}
-
 
 
 ## JSON RPC API Reference
